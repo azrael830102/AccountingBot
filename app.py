@@ -1,8 +1,18 @@
 from __future__ import unicode_literals
 
-import configparser
+import ctypes
 import os
+import sys
 import threading
+
+import win32api  # package pywin32
+import win32con
+import win32gui_struct
+
+try:
+    import winxpgui as win32gui
+except ImportError:
+    import win32gui
 
 from flask import Flask, abort, request
 from infi.systray import SysTrayIcon
@@ -13,8 +23,6 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 from MessageHandler import MessageHandler
 
 app = Flask(__name__)
-config = configparser.ConfigParser()
-config.read('config.ini')
 
 channel_access_token = "j0+juQAPLM/TpiLYueU4aTQc8VtNVj5jSVRNrskQj4htLE//AcTcrdZ2LIPmOqYvq4M5v42IZ4L0Y0EBgtemwKMeslujWBPcVt2vmlCfFIU6lgyEgINju5rhmgPlDevafwwVPzAS0oIGeuVoKqw5ZAdB04t89/1O/w1cDnyilFU="
 channel_secret = "ed44100c7733509cad6fd66a5a1c2776"
@@ -44,6 +52,7 @@ def pretty_echo(event):
 
 
 IsStart = False
+sys.stdout = open('AccountingBot_console.log', 'w')
 
 def fire():
     port = int(os.environ.get('PORT', 9527))
@@ -62,8 +71,18 @@ def on_quit_callback(systray):
     GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)
     pass
 
+def show(sysTrayIcon):
+    the_program_to_hide = ctypes.windll.kernel32.GetConsoleWindow()
+    win32gui.ShowWindow(the_program_to_hide, win32con.SW_SHOW)
+
+def hide(sysTrayIcon):
+    the_program_to_hide = ctypes.windll.kernel32.GetConsoleWindow()
+    win32gui.ShowWindow(the_program_to_hide, win32con.SW_HIDE)
+
 if __name__ == "__main__":
-    menu_options = (("Startup accounting bot", None, startup),)
+    menu_options = (("Startup accounting bot", None, startup),
+                    ("Show console", None, show),
+                    ("Hide console", None, hide),)
     icoPath = os.getcwd().replace("\\","/") + "/resources/AccountingBot.ico"
     systray = SysTrayIcon(icoPath, "Accounting bot Launcher", menu_options, on_quit=on_quit_callback)
     systray.start()

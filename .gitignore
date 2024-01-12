@@ -4,3 +4,4 @@ build/*
 dist/*
 resources/build/*
 resources/dist/*
+*.log
