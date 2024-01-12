@@ -1,1 +1,2 @@
 resources/ngrok.exe
+__pycache__/*
