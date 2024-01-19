@@ -33,11 +33,9 @@ class MessageHandler:
         else:
             try:
                 cash = int(msg)
-                if cash > 0:
-                    resultMsg = self._insertRecord(cash)
-                else:
-                    resultMsg = "Would not create a new record(cash = 0)."
-            except: 
+                resultMsg = self._insertRecord(cash)
+            except Exception as e:
+                resultMsg = f"Would not create a new record(error:{e})." 
                 pass
         return resultMsg
 
@@ -53,7 +51,7 @@ class MessageHandler:
             cur.execute(f"INSERT INTO {TABLE_NAME} VALUES (NULL,{cash},{currTime})")
             con.commit()
             currDateTime = current_milli_time_formatter(currTime)
-            resultMsg = f"New record: {currDateTime} → ${cash}"
+            resultMsg = f"New record:\n{currDateTime} → ${cash}"
         except Exception as e:
             resultMsg = f"{e}"
         return resultMsg
@@ -71,7 +69,7 @@ class MessageHandler:
                 startDateTime = current_milli_time_formatter(record[0], showTime=False)
                 endDateTime = current_milli_time_formatter(record[1], showTime=False)
                 totalCash = record[2]
-                resultMsg = f"{startDateTime} ~ {endDateTime} → Total: ${totalCash}"
+                resultMsg = f"{startDateTime} ~ {endDateTime}\n → Total: ${totalCash}"
                 pass
         except Exception as e:
             resultMsg = f"{e}"

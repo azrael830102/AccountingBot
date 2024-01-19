@@ -52,6 +52,7 @@ def pretty_echo(event):
 
 
 IsStart = False
+IsShow = True
 sys.stdout = open('AccountingBot_console.log', 'w')
 
 def fire():
@@ -71,6 +72,15 @@ def on_quit_callback(systray):
     GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)
     pass
 
+def ShowOrHide(sysTrayIcon):
+    global IsShow
+    if(IsShow):
+        IsShow = False
+        hide(sysTrayIcon)
+    else:
+        IsShow = True
+        show(sysTrayIcon)
+
 def show(sysTrayIcon):
     the_program_to_hide = ctypes.windll.kernel32.GetConsoleWindow()
     win32gui.ShowWindow(the_program_to_hide, win32con.SW_SHOW)
@@ -81,8 +91,7 @@ def hide(sysTrayIcon):
 
 if __name__ == "__main__":
     menu_options = (("Startup accounting bot", None, startup),
-                    ("Show console", None, show),
-                    ("Hide console", None, hide),)
+                    ("Show/Hide console", None, ShowOrHide),)
     icoPath = os.getcwd().replace("\\","/") + "/resources/AccountingBot.ico"
     systray = SysTrayIcon(icoPath, "Accounting bot Launcher", menu_options, on_quit=on_quit_callback)
     systray.start()
