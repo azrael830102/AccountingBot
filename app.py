@@ -52,6 +52,7 @@ def pretty_echo(event):
 
 
 IsStart = False
+IsStart_ngrok = False
 IsShow = True
 sys.stdout = open('AccountingBot_console.log', 'w')
 
@@ -65,11 +66,26 @@ def startup(systray):
     if not IsStart:
         threading.Thread(target=fire, daemon=True).start()
 
+def fire_ngrok():
+    target = os.getcwd().replace("\\","/") + "/resources/ngrok.exe"
+    cmd = f'"{target}" http 9527'
+    print(cmd)
+    retValue = os.system(cmd)
+    print(retValue)
+
+def startup_ngrok(systray):
+    global IsStart_ngrok
+    if not IsStart_ngrok:
+        IsStart_ngrok = True
+        threading.Thread(target=fire_ngrok).start()
+
 
 def on_quit_callback(systray):
     from win32api import GenerateConsoleCtrlEvent
     CTRL_C_EVENT = 0
     GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)
+    print("stop")
+    sys.stdout.close()
     pass
 
 def ShowOrHide(sysTrayIcon):
@@ -91,6 +107,7 @@ def hide(sysTrayIcon):
 
 if __name__ == "__main__":
     menu_options = (("Startup accounting bot", None, startup),
+                    ("Startup ngrok", None, startup_ngrok),
                     ("Show/Hide console", None, ShowOrHide),)
     icoPath = os.getcwd().replace("\\","/") + "/resources/AccountingBot.ico"
     systray = SysTrayIcon(icoPath, "Accounting bot Launcher", menu_options, on_quit=on_quit_callback)
